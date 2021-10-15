@@ -65,30 +65,25 @@ class PatientAction(Resource):
         return make_empty(200)
 
     @staticmethod
-    def put(patient_uuid):
+    def patch(patient_uuid):
         """Обновить информацию о пациенте по uuid"""
         if db.session.query(Patient).filter(Patient.uuid.like(str(patient_uuid))) \
                 .one_or_none() is None:
             abort(404, message="Patient with uuid={} not found"
                   .format(patient_uuid))
         try:
-            # args = PatientSchema().load(request.json)
             args = request.json
-            print("ARGS: ", args)
         except ValidationError as error:
             return make_response(400, message="Bad JSON format")
 
-        # patient = db.session.query(Patient).filter(Patient.uuid.like(str(patient_uuid))).one()
-        # try:
-        #     db.session.delete(patient)
-        # except exc.SQLAlchemyError:
-        #     db.session.rollback()
-        #     return make_response(500, message="Database delete error")
-        #
-        # try:
-        #     db.session.commit()
-        # except exc.SQLAlchemyError:
-        #     db.session.rollback()
-        #     return make_response(500, message="Database commit error")
+        patient = db.session.query(Patient).filter(Patient.uuid.like(str(patient_uuid))).one()
+        for key in args:
+            if args[key] is not None:
+                setattr(patient, key, args[key])
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
 
         return make_empty(200)
