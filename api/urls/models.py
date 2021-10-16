@@ -12,3 +12,35 @@ class Patient(db.Model):
     # def __repr__(self):
     #     return "<Patient: name={}, phone={}, birthday=\"{}\">\n"\
     #         .format(self.name, self.phone, self.birthday)
+
+
+class Doctor(db.Model):
+    uuid = db.Column(db.String(36), primary_key=True,
+                     default=lambda: str(uuid4()))
+    name = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(9), nullable=False)
+    speciality = db.Column(db.String(50), nullable=False)
+    qualification = db.Column(db.String(50), nullable=False)
+
+
+class Services(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Integer, nullable=False, default=0)
+
+
+class Record(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_uuid = db.Column(db.String, db.ForeignKey('patient.uuid'),
+                             nullable=False)
+    doctor_uuid = db.Column(db.String, db.ForeignKey('doctor.uuid'),
+                            nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    # used_services = db.relationship('Services', lazy='select',
+    #                                 backref=db.backref('Record', lazy='joined'))
+    used_services = db.Column(db.String, nullable=False)
+    # used_services = db.Column(db.String, nullable=False)
+    disease = db.Column(db.String(200), nullable=False)
+    discharge = db.Column(db.String, nullable=False)
+    payment_status = db.Column(db.Boolean, nullable=False, default=False)
+    sum = db.Column(db.Integer, nullable=False, default=0)

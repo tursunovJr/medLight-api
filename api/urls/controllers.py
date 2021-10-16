@@ -1,10 +1,10 @@
 from flask import request
-from flask_restful import Resource, abort, url_for
+from flask_restful import Resource, abort
 from marshmallow import ValidationError
 
-from api.urls.fields import patients_info_schema, patient_info_schema, PatientInfoSchema
-from api.urls.models import Patient
-from api.urls.parsers import PatientSchema
+from api.urls.fields import patients_info_schema, doctors_info_schema
+from api.urls.models import Patient, Record, Doctor
+from api.urls.parsers import PatientSchema, RecordSchema, DoctorSchema
 from api.utils import make_response, make_empty
 from extensions import db
 from sqlalchemy import exc
@@ -80,6 +80,113 @@ class PatientAction(Resource):
         for key in args:
             if args[key] is not None:
                 setattr(patient, key, args[key])
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(200)
+
+    @staticmethod
+    def post(patient_uuid):
+        "Создать запись для пациента"
+        if db.session.query(Patient).filter(Patient.uuid.like(str(patient_uuid))) \
+                .one_or_none() is None:
+            abort(404, message="Patient with uuid={} not found"
+                  .format(patient_uuid))
+        try:
+            args = RecordSchema().load(request.json)
+            args['patient_uuid'] = str(patient_uuid)
+            # print(args['used_services'])
+        except ValidationError as error:
+            return make_response(400, message="Bad JSON format")
+        record = Record(**args)
+        try:
+            db.session.add(record)
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database add error")
+
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(201)
+
+
+class Doctors(Resource):
+    @staticmethod
+    def post():
+        """Создать нового врача"""
+        try:
+            args = DoctorSchema().load(request.json)
+        except ValidationError as error:
+            return make_response(400, message="Bad JSON format")
+        doctor = Doctor(**args)
+        try:
+            db.session.add(doctor)
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database add error")
+
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(201)
+
+    @staticmethod
+    def get():
+        """Получить список всех врачей"""
+        doctors = db.session.query(Doctor).all()
+        return make_response(200, doctor=doctors_info_schema.dump(doctors))
+
+
+class DoctorAction(Resource):
+    @staticmethod
+    def delete(doctor_uuid):
+        """Удалить врача по uuid"""
+        if db.session.query(Doctor).filter(Doctor.uuid.like(str(doctor_uuid)))\
+                .one_or_none() is None:
+            abort(404, message="Doctor with uuid={} not found"
+                  .format(doctor_uuid))
+
+        doctor = db.session.query(Doctor).filter(Doctor.uuid.like(str(doctor_uuid))).one()
+        try:
+            db.session.delete(doctor)
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database delete error")
+
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(200)
+
+    @staticmethod
+    def patch(doctor_uuid):
+        """Обновить информацию о враче по uuid"""
+        if db.session.query(Doctor).filter(Doctor.uuid.like(str(doctor_uuid))) \
+                .one_or_none() is None:
+            abort(404, message="Doctor with uuid={} not found"
+                  .format(doctor_uuid))
+        try:
+            args = request.json
+        except ValidationError as error:
+            return make_response(400, message="Bad JSON format")
+
+        doctor = db.session.query(Doctor).filter(Doctor.uuid.like(str(doctor_uuid))).one()
+        for key in args:
+            if args[key] is not None:
+                setattr(doctor, key, args[key])
         try:
             db.session.commit()
         except exc.SQLAlchemyError:
