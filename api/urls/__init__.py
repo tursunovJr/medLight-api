@@ -1,7 +1,7 @@
 from flask import Blueprint, json
 from flask_restful import Api
 from werkzeug.exceptions import HTTPException
-from api.urls.controllers import Patients, PatientAction, Doctors, DoctorAction
+from api.urls.controllers import Patients, PatientAction, Doctors, DoctorAction, Services, ServiceAction
 
 api_urls_bp = Blueprint("api", __name__)
 api_urls = Api(api_urls_bp)
@@ -11,6 +11,8 @@ api_urls.add_resource(Patients, "/patients")
 api_urls.add_resource(PatientAction, "/patients/<uuid:patient_uuid>")
 api_urls.add_resource(Doctors, "/doctors")
 api_urls.add_resource(DoctorAction, "/doctors/<uuid:doctor_uuid>")
+api_urls.add_resource(Services, "/services")
+api_urls.add_resource(ServiceAction, "/services/<uuid:service_uuid>")
 
 # JSON format for error
 @api_urls_bp.errorhandler(HTTPException)

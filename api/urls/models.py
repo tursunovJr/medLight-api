@@ -23,8 +23,9 @@ class Doctor(db.Model):
     qualification = db.Column(db.String(50), nullable=False)
 
 
-class Services(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+class Service(db.Model):
+    uuid = db.Column(db.String(36), primary_key=True,
+                     default=lambda: str(uuid4()))
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False, default=0)
 

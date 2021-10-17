@@ -17,5 +17,12 @@ class DoctorInfoSchema(Schema):
     qualification = fields.String(attribute="qualification", required=True)
 
 
+class ServiceInfoSchema(Schema):
+    uuid = fields.String(attribute="uuid")
+    name = fields.String(attribute="name", required=True)
+    price = fields.Integer(attribute="price", required=True)
+
+
 patients_info_schema = PatientInfoSchema(many=True)
 doctors_info_schema = DoctorInfoSchema(many=True)
+services_info_schema = ServiceInfoSchema(many=True)

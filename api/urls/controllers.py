@@ -2,9 +2,9 @@ from flask import request
 from flask_restful import Resource, abort
 from marshmallow import ValidationError
 
-from api.urls.fields import patients_info_schema, doctors_info_schema
-from api.urls.models import Patient, Record, Doctor
-from api.urls.parsers import PatientSchema, RecordSchema, DoctorSchema
+from api.urls.fields import patients_info_schema, doctors_info_schema, services_info_schema
+from api.urls.models import Patient, Record, Doctor, Service
+from api.urls.parsers import PatientSchema, RecordSchema, DoctorSchema, ServiceSchema
 from api.utils import make_response, make_empty
 from extensions import db
 from sqlalchemy import exc
@@ -187,6 +187,85 @@ class DoctorAction(Resource):
         for key in args:
             if args[key] is not None:
                 setattr(doctor, key, args[key])
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(200)
+
+
+class Services(Resource):
+    @staticmethod
+    def post():
+        """Создать новую услугу"""
+        try:
+            args = ServiceSchema().load(request.json)
+        except ValidationError as error:
+            return make_response(400, message="Bad JSON format")
+        service = Service(**args)
+        try:
+            db.session.add(service)
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database add error")
+
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(201)
+
+    @staticmethod
+    def get():
+        """Получить список всех услуг"""
+        services = db.session.query(Service).all()
+        return make_response(200, service=services_info_schema.dump(services))
+
+
+class ServiceAction(Resource):
+    @staticmethod
+    def delete(service_uuid):
+        """Удалить услугу по id"""
+        if db.session.query(Service).filter(Service.uuid.like(str(service_uuid)))\
+                .one_or_none() is None:
+            abort(404, message="Service with uuid={} not found"
+                  .format(service_uuid))
+
+        service = db.session.query(Service).filter(Service.uuid.like(str(service_uuid))).one()
+        try:
+            db.session.delete(service)
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database delete error")
+
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(200)
+
+    @staticmethod
+    def patch(service_uuid):
+        """Обновить информацию о услуге по id"""
+        if db.session.query(Service).filter(Service.uuid.like(str(service_uuid))) \
+                .one_or_none() is None:
+            abort(404, message="Service with uuid={} not found"
+                  .format(service_uuid))
+        try:
+            args = request.json
+        except ValidationError as error:
+            return make_response(400, message="Bad JSON format")
+
+        service = db.session.query(Service).filter(Service.uuid.like(str(service_uuid))).one()
+        for key in args:
+            if args[key] is not None:
+                setattr(service, key, args[key])
         try:
             db.session.commit()
         except exc.SQLAlchemyError:
