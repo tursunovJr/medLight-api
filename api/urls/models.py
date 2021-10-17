@@ -31,7 +31,8 @@ class Service(db.Model):
 
 
 class Record(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uuid = db.Column(db.String(36), primary_key=True,
+                     default=lambda: str(uuid4()))
     patient_uuid = db.Column(db.String, db.ForeignKey('patient.uuid'),
                              nullable=False)
     doctor_uuid = db.Column(db.String, db.ForeignKey('doctor.uuid'),

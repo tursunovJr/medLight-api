@@ -33,21 +33,29 @@ paths:
         description: "Patients data needs to be added to the data base"
         required: true
         schema:
-            $ref: "#/definitions/Patient"
+            $ref: "#/definitions/PatientNoAuthor"
 
       responses:
         "201":
           description: "Patient created"
-          schema: 
+          schema:
             type: "object"
         "400":
           description: "Bad JSON format"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Bad JSON format"
+        "500":
+          description: "Data base add error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Data base add error"
     get:
       tags:
       - "patients"
@@ -70,8 +78,8 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Patient"
-  /patients/{uuid}:  
+              $ref: "#/definitions/PatientNoAuthor"
+  /patients/{uuid}:
     delete:
       tags:
       - "patients"
@@ -91,27 +99,15 @@ paths:
           description: "Patient deleted"
           schema:
             type: "object"
+        "404":
+          description: "Patient with uuid not found"
+          schema:
+            type: "object"
             properties:
               message:
                 type: "string"
-                example: "Sucessful deleted"
-        "400":
-          description: "Wrong format UUID"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Wrong format UUID"
-        "404":
-          description: "Patient with uuid not found"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
                 example: "Patient with uuid not found"
-    put:
+    patch:
       tags:
       - "patients"
       summary: "Updated patient info"
@@ -155,18 +151,18 @@ paths:
                 example: "Sucessful updated"
         "400":
           description: "Wrong format UUID"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Wrong format UUID"
         "404":
           description: "Patient with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Patient with uuid not found"
     post:
@@ -194,22 +190,22 @@ paths:
       responses:
         "201":
           description: "Patient created"
-          schema: 
+          schema:
             type: "object"
         "400":
           description: "Bad JSON format"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Bad JSON format"
         "404":
           description: "Patient with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Patient with uuid not found"
 
@@ -236,7 +232,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Record"
+              $ref: "#/definitions/RecordUuid"
   /records/{uuid}:
     get:
       tags:
@@ -259,18 +255,18 @@ paths:
             $ref: "#/definitions/RecordUuid"
         "400":
           description: "Wrong format UUID"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Wrong format UUID"
         "404":
           description: "Patient with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Patient with uuid not found"
     delete:
@@ -298,63 +294,18 @@ paths:
                 example: "Sucessful deleted"
         "400":
           description: "Wrong format UUID"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Wrong format UUID"
-        "404":
-          description: "Record with uuid not found"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Patient with uuid not found"
-    put:
-      tags:
-      - "records"
-      summary: "Updated record info"
-      operationId: "updateRecord"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "uuid"
-        in: "path"
-        description: "uuid of record that need to be updated"
-        required: true
-        type: "string"
-        format: "uuid"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/RecordUuid"
-      responses:
-        '200':
-          description: "Record updated"
           schema:
             type: "object"
             properties:
               message:
                 type: "string"
-                example: "Sucessful updated"
-        "400":
-          description: "Wrong format UUID"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
                 example: "Wrong format UUID"
         "404":
-          description: "Patient with uuid not found"
-          schema: 
+          description: "Record with uuid not found"
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Patient with uuid not found"
     patch:
@@ -407,16 +358,40 @@ paths:
       responses:
         "201":
           description: "Patient created"
-          schema: 
+          schema:
             type: "object"
         "400":
           description: "Bad JSON format"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
-                example: "Bad JSON format"  
+                example: "Bad JSON format"
+    get:
+      tags:
+      - "doctors"
+      summary: "Finds info about all doctors"
+      operationId: "findDoctorByFilter"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tags"
+        in: "query"
+        description: "Tags to filter by"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Doctor"
+
   /doctors/{uuid}:
     delete:
       tags:
@@ -443,21 +418,21 @@ paths:
                 example: "Sucessful deleted"
         "400":
           description: "Wrong format UUID"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Wrong format UUID"
         "404":
           description: "Doctor with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Doctor with uuid not found"
-    put:
+    patch:
       tags:
       - "doctors"
       summary: "Updated doctor's info"
@@ -488,18 +463,18 @@ paths:
                 example: "Sucessful updated"
         "400":
           description: "Wrong format UUID"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Wrong format UUID"
         "404":
           description: "Patient with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Patient with uuid not found"
   /services:
@@ -521,16 +496,16 @@ paths:
       responses:
         "201":
           description: "Service created"
-          schema: 
+          schema:
             type: "object"
         "400":
           description: "Bad JSON format"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
-                example: "Bad JSON format" 
+                example: "Bad JSON format"
     get:
       tags:
       - "services"
@@ -580,21 +555,21 @@ paths:
                 example: "Sucessful deleted"
         "400":
           description: "Wrong format UUID"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Wrong format UUID"
         "404":
           description: "Service with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Service with uuid not found"
-    put:
+    patch:
       tags:
       - "services"
       summary: "Updated service's info"
@@ -625,157 +600,20 @@ paths:
                 example: "Sucessful updated"
         "400":
           description: "Wrong format UUID"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Wrong format UUID"
         "404":
           description: "Service with uuid not found"
-          schema: 
+          schema:
             type: "object"
-            properties: 
-              message: 
+            properties:
+              message:
                 type: "string"
                 example: "Service with uuid not found"
-  /treatments:
-    post:
-      tags:
-      - "treatments"
-      summary: "Creates new treatment"
-      description: "Создание нового готового лечения для болезни"
-      operationId: "createTreatments"
-      consumes:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Treatment data needs to be added to the data base"
-        required: true
-        schema:
-            $ref: "#/definitions/Treatment"
-      responses:
-        "201":
-          description: "Treatment created"
-          schema: 
-            type: "object"
-        "400":
-          description: "Bad JSON format"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Bad JSON format" 
-    get:
-      tags:
-      - "treatments"
-      summary: "Finds info about treatments"
-      operationId: "findTreatmentByFilter"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Treatment"
-  /treatments/{uuid}:
-    delete:
-      tags:
-      - "treatments"
-      summary: "Deletes a treatment with uuid"
-      operationId: "deleteTreatment"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "uuid"
-        in: "path"
-        description: "treatment uuid to delete"
-        required: true
-        type: "string"
-        format: "uuid"
-      responses:
-        '200':
-          description: "Treatments deleted"
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "Sucessful deleted"
-        "400":
-          description: "Wrong format UUID"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Wrong format UUID"
-        "404":
-          description: "Treatment with uuid not found"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Treatment with uuid not found"
-    put:
-      tags:
-      - "treatments"
-      summary: "Updated treatment's info"
-      operationId: "updateTreatment"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "uuid"
-        in: "path"
-        description: "uuid of treatment that need to be updated"
-        required: true
-        type: "string"
-        format: "uuid"
-      - in: "body"
-        name: "body"
-        description: "Updated treatment object"
-        required: true
-        schema:
-          $ref: "#/definitions/Treatment"
-      responses:
-        '200':
-          description: "Treatment updated"
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "Sucessful updated"
-        "400":
-          description: "Wrong format UUID"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Wrong format UUID"
-        "404":
-          description: "Treatment with uuid not found"
-          schema: 
-            type: "object"
-            properties: 
-              message: 
-                type: "string"
-                example: "Treatment with uuid not found"
   /user/login:
     get:
       tags:
@@ -871,7 +709,7 @@ paths:
         schema:
           $ref: "#/definitions/User"
       responses:
-        
+
         "400":
           description: "Invalid record uuid supplied"
         "404":
@@ -928,42 +766,21 @@ definitions:
         format: "date"
       author:
         $ref: "#/definitions/User"
-  PatientNoAuthor: 
+  PatientNoAuthor:
     type: "object"
     properties:
       uuid:
         type: "string"
         format: "uuid"
-      full_name:
+      name:
         type: "string"
         example: "Yusupov Felix"
-      phone_number:
+      phone:
         type: "string"
         example: "998974544584"
       birthday:
         type: "string"
-        format: "date"    
-  Record:
-    type: "object"
-    properties:
-      uuid:
-        type: "string"
-        format: "uuid"
-      patient:
-        $ref: "#/definitions/PatientNoAuthor"
-      doctor:
-        $ref: "#/definitions/Doctor"
-      record_date:
-        type: "string"
-        format: "datetime"
-      payment_status:
-        type: "string"
-        example: "Оплатил"
-      sum:
-        type: "integer"
-        example: "50000"
-      author:
-        $ref: "#/definitions/User"
+        format: "date"
   Doctor:
     type: "object"
     properties:
@@ -985,13 +802,12 @@ definitions:
   RecordUuid:
     type: "object"
     properties:
-      uuid:
+      patient_uuid:
         type: "string"
         format: "uuid"
-      patient:
-        $ref: "#/definitions/PatientNoAuthor"
-      doctor:
-        $ref: "#/definitions/Doctor"
+      doctor_uuid:
+        type: "string"
+        format: "uuid"
       record_date:
         type: "string"
         format: "datetime"
@@ -999,7 +815,7 @@ definitions:
         type: "array"
         items:
           type: "string"
-        example: "ЭЭГ"
+        example: "[ЭЭГ, МРТ]"
       disease:
         type: "string"
         example: "Воспаление лицевого тройничного нерва"
@@ -1020,28 +836,9 @@ definitions:
       uuid:
         type: "string"
         format: "uuid"
-      name: 
+      name:
         type: "string"
         example: "МРТ головы"
       price:
         type: "integer"
         example: 150000
-  Treatment:
-    type: "object"
-    properties:
-      uuid:
-        type: "string"
-        format: "uuid"
-      doctor:
-        $ref: "#/definitions/Doctor"
-      disease:
-        type: "string"
-        example: "Воспаление лицевого тройничного нерва"
-      discharge:
-        type: "array"
-        items:
-          type: "string"
-        example: "Ципролет 0.5/3 7 дней"
-      
-      
-      

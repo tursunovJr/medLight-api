@@ -23,6 +23,20 @@ class ServiceInfoSchema(Schema):
     price = fields.Integer(attribute="price", required=True)
 
 
+class RecordInfoSchema(Schema):
+    uuid = fields.String(attribute="uuid")
+    patient_uuid = fields.String(attribute="patient_uuid", required=True)
+    doctor_uuid = fields.String(attribute="doctor_uuid", required=True)
+    date = fields.DateTime(attribute="date", required=True)
+    used_services = fields.String(attribute="used_services", required=True)
+    disease = fields.String(attribute="disease", required=True)
+    discharge = fields.String(attribute="discharge", required=True)
+    payment_status = fields.Boolean(attribute="payment_status", required=True)
+    sum = fields.Integer(attribute="sum", required=True)
+
+
 patients_info_schema = PatientInfoSchema(many=True)
 doctors_info_schema = DoctorInfoSchema(many=True)
 services_info_schema = ServiceInfoSchema(many=True)
+records_info_schema = RecordInfoSchema(many=True)
+record_info_schema = RecordInfoSchema()

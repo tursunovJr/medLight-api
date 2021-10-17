@@ -2,7 +2,8 @@ from flask import request
 from flask_restful import Resource, abort
 from marshmallow import ValidationError
 
-from api.urls.fields import patients_info_schema, doctors_info_schema, services_info_schema
+from api.urls.fields import patients_info_schema, doctors_info_schema, services_info_schema, records_info_schema, \
+    record_info_schema
 from api.urls.models import Patient, Record, Doctor, Service
 from api.urls.parsers import PatientSchema, RecordSchema, DoctorSchema, ServiceSchema
 from api.utils import make_response, make_empty
@@ -266,6 +267,73 @@ class ServiceAction(Resource):
         for key in args:
             if args[key] is not None:
                 setattr(service, key, args[key])
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(200)
+
+
+class Records(Resource):
+    @staticmethod
+    def get():
+        """Получить список всех записей пациентов у врача"""
+        records = db.session.query(Record).all()
+        return make_response(200, records=records_info_schema.dump(records))
+
+
+class RecordAction(Resource):
+    @staticmethod
+    def get(record_uuid):
+        """Получить запись по uuid"""
+        if db.session.query(Record).filter(Record.uuid.like(str(record_uuid))) \
+                .one_or_none() is None:
+            abort(404, message="Record with uuid={} not found"
+                  .format(record_uuid))
+        record = db.session.query(Record).filter(Record.uuid.like(str(record_uuid))).one()
+        return make_response(200, **record_info_schema.dump(record))
+
+    @staticmethod
+    def delete(record_uuid):
+        """Удалить запись по uuid"""
+        if db.session.query(Service).filter(Service.uuid.like(str(record_uuid))) \
+                .one_or_none() is None:
+            abort(404, message="Service with uuid={} not found"
+                  .format(record_uuid))
+
+        record = db.session.query(Record).filter(Record.uuid.like(str(record_uuid))).one()
+        try:
+            db.session.delete(record)
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database delete error")
+
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return make_response(500, message="Database commit error")
+
+        return make_empty(200)
+
+    @staticmethod
+    def patch(record_uuid):
+        """Обновить информацию о записи по uuid"""
+        if db.session.query(Record).filter(Record.uuid.like(str(record_uuid))) \
+                .one_or_none() is None:
+            abort(404, message="Record with uuid={} not found"
+                  .format(record_uuid))
+        try:
+            args = request.json
+        except ValidationError as error:
+            return make_response(400, message="Bad JSON format")
+
+        record = db.session.query(Record).filter(Record.uuid.like(str(record_uuid))).one()
+        for key in args:
+            if args[key] is not None:
+                setattr(record, key, args[key])
         try:
             db.session.commit()
         except exc.SQLAlchemyError:
