@@ -36,7 +36,9 @@ class RecordInfoSchema(Schema):
 
 
 patients_info_schema = PatientInfoSchema(many=True)
+patient_info_schema = PatientInfoSchema()
 doctors_info_schema = DoctorInfoSchema(many=True)
+doctor_info_schema = DoctorInfoSchema()
 services_info_schema = ServiceInfoSchema(many=True)
 records_info_schema = RecordInfoSchema(many=True)
 record_info_schema = RecordInfoSchema()

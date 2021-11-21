@@ -15,13 +15,16 @@ api_urls.add_resource(Main, "")
 api_urls.add_resource(UserSignUp, "/signup")
 api_urls.add_resource(UserLogIn, "/login")
 api_urls.add_resource(Patients, "/patients")
-api_urls.add_resource(PatientAction, "/patients/<uuid:patient_uuid>")
+api_urls.add_resource(PatientAction, "/patients/<uuid:patient_uuid>",
+                      endpoint="patient_info")
 api_urls.add_resource(Doctors, "/doctors")
-api_urls.add_resource(DoctorAction, "/doctors/<uuid:doctor_uuid>")
+api_urls.add_resource(DoctorAction, "/doctors/<uuid:doctor_uuid>",
+                      endpoint="doctor_info")
 api_urls.add_resource(Services, "/services")
 api_urls.add_resource(ServiceAction, "/services/<uuid:service_uuid>")
 api_urls.add_resource(Records, "/records")
-api_urls.add_resource(RecordAction, "/records/<uuid:record_uuid>")
+api_urls.add_resource(RecordAction, "/records/<uuid:record_uuid>",
+                      endpoint="record_info")
 
 # JSON format for error
 @api_bp.errorhandler(HTTPException)
