@@ -28,7 +28,6 @@ def create_app(config_name=None):
         }
     )
 
-
     if config_name is None:
         config_name = "production"
 
@@ -47,5 +46,5 @@ def create_app(config_name=None):
     # Register Blueprints
     from api import api_bp
     app.register_blueprint(api_bp, url_prefix="/api/v1")
-    app.register_blueprint(swaggerui_blueprint, url_prefix="/api/v1" + SWAGGER_URL)
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
     return app
