@@ -1,0 +1,662 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "MedLight API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "tags": [
+    {
+      "name": "patients",
+      "name1": "records",
+      "name2": "doctors",
+      "names3": "services"
+    }
+  ],
+  "basePath": "/api/v1",
+  "host": "localhost:8080",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+
+  "paths": {
+    "/patients": {
+      "post": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Создание нового пациента",
+        "operationId": "createPatient",
+        "description": "create new patient",
+        "parameters": [
+          {
+            "name": "patientData",
+            "in": "body",
+            "description": "Данные пациента",
+            "schema": {
+              "$ref": "#/definitions/Patient"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Patient created",
+            "schema": {
+              "$ref": "#/definitions/Location"
+            }
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      },
+      "get": {
+          "tags": [
+          "patients"
+        ],
+          "summary": "Получить всех пациентов",
+          "operationId": "getAllPatient",
+          "description": "Get all patients",
+          "responses": {
+              "200": {
+                  "description": "Got all patients",
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Patient"
+                    }
+                  }
+              }
+          }
+      }
+    },
+    "/patients/{patient_uuid}": {
+      "post": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Создание новой записи",
+        "operationId": "createRecord",
+        "description": "Create new record",
+        "parameters": [
+          {
+            "name": "recordData",
+            "in": "body",
+            "description": "Данные записи",
+            "schema": {
+              "$ref": "#/definitions/Record"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Record created",
+            "schema": {
+              "$ref": "#/definitions/Location"
+            }
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      },
+      "get": {
+          "tags": [
+          "patients"
+        ],
+          "summary": "Get one patient",
+          "operationId": "getPatient",
+          "description": "Get one patient",
+          "responses": {
+              "200": {
+                  "description": "Got patient",
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Patient"
+                    }
+                  }
+              },
+            "404":{
+              "description": "Patient doesn't found"
+            }
+          }
+      },
+      "delete": {
+        "tags": [
+          "patients"
+        ],
+          "summary": "Delete one patient",
+          "operationId": "deletePatient",
+          "description": "Delete one patient",
+          "responses": {
+              "200": {
+                  "description": "Patient deleted"
+              },
+            "404":{
+              "description": "Patient doesn't found"
+            },
+            "500": {
+              "description": "Database add/commit error"
+            }
+          }
+      },
+      "patch": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Update patient data",
+        "operationId": "patchPatient",
+        "description": "Refresh some patients info",
+        "parameters": [
+          {
+            "name": "patientData",
+            "in": "body",
+            "description": "Patient data",
+            "schema": {
+              "$ref": "#/definitions/Patient"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Patient info updated"
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "404": {
+            "description": "Patient doesn't found"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      }
+
+    },
+    "/records": {
+      "get": {
+          "tags": [
+          "records"
+        ],
+          "summary": "Get all records",
+          "operationId": "getAllRecords",
+          "description": "Get all records",
+          "responses": {
+              "200": {
+                  "description": "Got all records",
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Record"
+                    }
+                  }
+              }
+          }
+      }
+    },
+    "/records/{record_uuid}": {
+      "get": {
+          "tags": [
+          "records"
+        ],
+          "summary": "Get one record",
+          "operationId": "getRecord",
+          "description": "Get one record",
+          "responses": {
+              "200": {
+                  "description": "Got record",
+                  "schema": {
+                      "$ref": "#/definitions/Record"
+                  }
+              },
+            "404":{
+              "description": "Record doesn't found"
+            }
+          }
+      },
+      "delete": {
+        "tags": [
+          "records"
+        ],
+          "summary": "Delete one record",
+          "operationId": "deleteRecord",
+          "description": "Delete one record",
+          "responses": {
+              "200": {
+                  "description": "Record deleted"
+              },
+            "404":{
+              "description": "Record doesn't found"
+            },
+            "500": {
+              "description": "Database add/commit error"
+            }
+          }
+      },
+      "patch": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Update record data",
+        "operationId": "patchRecord",
+        "description": "Refresh some record's info",
+        "parameters": [
+          {
+            "name": "recordData",
+            "in": "body",
+            "description": "Record data",
+            "schema": {
+              "$ref": "#/definitions/Record"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record info updated"
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "404": {
+            "description": "Record doesn't found"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      }
+    },
+    "/doctors": {
+      "post": {
+        "tags": [
+          "doctors"
+        ],
+        "summary": "Create new doctor",
+        "operationId": "createDoctor",
+        "description": "create new doctort",
+        "parameters": [
+          {
+            "name": "doctorData",
+            "in": "body",
+            "description": "Doctor's data",
+            "schema": {
+              "$ref": "#/definitions/Doctor"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Doctor created",
+            "schema": {
+              "$ref": "#/definitions/Location"
+            }
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      },
+      "get": {
+          "tags": [
+          "doctors"
+        ],
+          "summary": "Get all doctors",
+          "operationId": "getAllDoctors",
+          "description": "Get all doctors",
+          "responses": {
+              "200": {
+                  "description": "Got all doctors",
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Doctor"
+                    }
+                  }
+              }
+          }
+      }
+    },
+    "/doctors/{doctor_uuid}": {
+      "get": {
+          "tags": [
+          "doctors"
+        ],
+          "summary": "Get one doctor",
+          "operationId": "getDoctor",
+          "description": "Get one doctor",
+          "responses": {
+              "200": {
+                  "description": "Got doctor",
+                  "schema": {
+                      "$ref": "#/definitions/Doctor"
+                  }
+              },
+            "404":{
+              "description": "Doctor doesn't found"
+            }
+          }
+      },
+      "delete": {
+        "tags": [
+          "doctors"
+        ],
+          "summary": "Delete one doctor",
+          "operationId": "deleteDoctor",
+          "description": "Delete one doctor",
+          "responses": {
+              "200": {
+                  "description": "Doctor deleted"
+              },
+            "404":{
+              "description": "Doctor doesn't found"
+            },
+            "500": {
+              "description": "Database add/commit error"
+            }
+          }
+      },
+      "patch": {
+        "tags": [
+          "doctors"
+        ],
+        "summary": "Update doctor's data",
+        "operationId": "patchDoctor",
+        "description": "Refresh some doctor's info",
+        "parameters": [
+          {
+            "name": "doctorData",
+            "in": "body",
+            "description": "Doctor data",
+            "schema": {
+              "$ref": "#/definitions/Doctor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Doctor info updated"
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "404": {
+            "description": "Doctor doesn't found"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      }
+    },
+    "/services": {
+      "post": {
+        "tags": [
+          "services"
+        ],
+        "summary": "Create new service",
+        "operationId": "createService",
+        "description": "create new service",
+        "parameters": [
+          {
+            "name": "serviceData",
+            "in": "body",
+            "description": "Service's data",
+            "schema": {
+              "$ref": "#/definitions/Service"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Service created",
+            "schema": {
+              "$ref": "#/definitions/Location"
+            }
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      },
+      "get": {
+          "tags": [
+          "services"
+        ],
+          "summary": "Get all services",
+          "operationId": "getAllServices",
+          "description": "Get all services",
+          "responses": {
+              "200": {
+                  "description": "Got all services",
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Service"
+                    }
+                  }
+              }
+          }
+      }
+    },
+    "/services/{service_uuid}": {
+      "get": {
+          "tags": [
+          "services"
+        ],
+          "summary": "Get one service",
+          "operationId": "getService",
+          "description": "Get one service",
+          "responses": {
+              "200": {
+                  "description": "Got service",
+                  "schema": {
+                      "$ref": "#/definitions/Service"
+                  }
+              },
+            "404":{
+              "description": "Service doesn't found"
+            }
+          }
+      },
+      "delete": {
+        "tags": [
+          "services"
+        ],
+          "summary": "Delete one service",
+          "operationId": "deleteService",
+          "description": "Delete one service",
+          "responses": {
+              "200": {
+                  "description": "Service deleted"
+              },
+            "404":{
+              "description": "Service doesn't found"
+            },
+            "500": {
+              "description": "Database add/commit error"
+            }
+          }
+      },
+      "patch": {
+        "tags": [
+          "services"
+        ],
+        "summary": "Update service's data",
+        "operationId": "patchService",
+        "description": "Refresh some service's info",
+        "parameters": [
+          {
+            "name": "serviceData",
+            "in": "body",
+            "description": "Service data",
+            "schema": {
+              "$ref": "#/definitions/Service"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service info updated"
+          },
+          "400": {
+            "description": "Bad JSON format"
+          },
+          "404": {
+            "description": "Service doesn't found"
+          },
+          "500": {
+            "description": "Database add/commit error"
+          }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "Location": {
+      "type": "object",
+      "required": [
+        "location"
+      ],
+      "properties": {
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "Patient": {
+      "type": "object",
+      "required": [
+        "name",
+        "phone",
+        "birthday"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Yusupov Felix"
+        },
+        "phone": {
+          "type": "string",
+          "example": "984544584"
+        },
+        "birthday": {
+          "type": "string",
+          "format": "date",
+          "example": "2000-08-13"
+        }
+      }
+    },
+    "Record": {
+      "type": "object",
+      "required": [
+        "doctor_uuid",
+        "date",
+        "used_services",
+        "disease",
+        "discharge",
+        "payment_status",
+        "sum"
+      ],
+      "properties": {
+        "doctor_uuid": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "example": "2000-08-13"
+        },
+        "used_services": {
+          "type": "string",
+          "example": "[\"neu-osm\", \"eeg\"]"
+        },
+        "disease": {
+          "type": "string",
+          "example": "Сотресение"
+        },
+        "discharge": {
+          "type": "string",
+          "example": "Сотресение"
+        },
+        "payment_status": {
+          "type": "boolean",
+          "example": "false"
+        },
+        "sum": {
+          "type": "integer",
+          "example": "58000"
+        }
+      }
+    },
+    "Doctor": {
+      "type": "object",
+      "required": [
+        "name",
+        "phone",
+        "speciality",
+        "qualification"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Tursunov Jasur"
+        },
+        "phone": {
+          "type": "string",
+          "example": "999999977"
+        },
+        "speciality": {
+          "type": "string",
+          "example": "Невропатолог"
+        },
+        "qualification": {
+          "type": "string",
+          "example": "Высшая"
+        }
+      }
+    },
+    "Service": {
+      "type": "object",
+      "required": [
+        "name",
+        "price"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Tursunov Jasur"
+        },
+        "price": {
+          "type": "integer",
+          "example": "56000"
+        }
+      }
+    }
+  }
+}
